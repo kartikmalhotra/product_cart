@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -34,15 +33,6 @@ class NativeAPIService {
     }
 
     return _instance;
-  }
-
-  /// This function gets the list of Enrolled biometrcis present on device
-  Future<List<BiometricType>> getEnrolledBiometrics() async {
-    List<BiometricType> enrolledBiometrics = [];
-    try {
-      // enrolledBiometrics = await Application.localAuth.getAvailableBiometrics();
-    } on PlatformException catch (e) {}
-    return enrolledBiometrics;
   }
 
   /// ******************************************************

@@ -111,13 +111,6 @@ class UserRepositoryImpl implements UserRepository {
             userAuthDataToStore: _requestParams);
 
         return response;
-      } else if (response is RestAPIUnAuthenticationModel) {
-        final Map<String, String?> errorResponse = {
-          "code": response.code.toString(),
-          "message": response.message,
-          "remaining_attempts": response.loginAttemptsRemaining.toString(),
-        };
-        return RestAPIErrorModel.fromJson(errorResponse);
       }
     } catch (e) {
       final Map<String, String> errorResponse =
@@ -298,13 +291,6 @@ class UserRepositoryImpl implements UserRepository {
     userModelData = null;
 
     Application.storageService!.isUserLoggedIn = false;
-    // Application.storageService!.recentSearches = RecentSearchesModel();
-    // Application.storageService!.inProgressTroubleshootData =
-    //     IFixedItTroubleshootModel(inProgress: []);
-
-    /// Reset FCM Device Token
-    /// TODO: Firebase
-    // Application.firebaseMessagingService.deleteActiveFCMToken();
   }
 
   @override
@@ -481,21 +467,6 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  @override
-  Future<dynamic> getUserColorSettings() async {
-    try {
-      /// Fetch user color settings
-      final response = await Application.restService!.requestCall(
-          apiEndPoint: AppRestEndPoints.userColorSettings,
-          method: RestAPIRequestMethods.GET);
-      return response;
-    } catch (e) {
-      final Map<String, String> errorResponse =
-          Application.restService!.getErrorResponse(e as RestAPICallException);
-      return RestAPIErrorModel.fromJson(errorResponse);
-    }
-  }
-
   String _decodeBase64(String str) {
     String output = str.replaceAll('-', '+').replaceAll('_', '/');
     switch (output.length % 4) {
@@ -536,9 +507,6 @@ class UserRepositoryImpl implements UserRepository {
       Application.storageService!.isUserLoggedIn = true;
       AppUser.isUserLoggedIn = true;
     }
-
-    /// TODO: Crashlytics
-    /// Application.crashlyticsService.addCrashlyticsCustomKeys();
   }
 
   void initializeUserProfileData(Map<String, dynamic> response) {

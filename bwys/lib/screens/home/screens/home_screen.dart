@@ -1,8 +1,9 @@
+import 'package:bwys/config/application.dart';
 import 'package:bwys/screens/home/repository/repository.dart';
 import 'package:bwys/shared/bloc/product/product_bloc.dart';
 import 'package:bwys/shared/models/product_model.dart';
-import 'package:bwys/utils/ui/ui_utils.dart';
 import 'package:bwys/widget/widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -46,133 +47,133 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void _homeBlocListener(BuildContext context, ProductState homeState) {}
+  final Stream<QuerySnapshot> _usersStream = Application
+      .firebaseService!.firestoreInstance!
+      .collection('proiduct_data')
+      .snapshots();
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ProductBloc, ProductState>(
-      listener: _homeBlocListener,
-      child: BlocBuilder<ProductBloc, ProductState>(
-        buildWhen: (previous, current) => current is! AddProductMessage,
-        builder: (context, state) {
-          if (state is HomeDataLoadedState && state.restAPIError != null) {
-            return AppShowError(error: state.restAPIError);
-          } else if (state is HomeDataLoadedState &&
-              state.restAPIError == null) {
-            productList = state.products;
+    return StreamBuilder<QuerySnapshot>(
+      stream: _usersStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Text('Something went wrong');
+        }
 
-            return RefreshIndicator(
-              child: _showProductList(context, state),
-              onRefresh: () {
-                return Future.delayed(
-                  Duration(seconds: 1),
-                  () {
-                    setState(() {
-                      page = (page + 1) % (productList?.length as int);
-                    });
-                  },
-                );
-              },
-            );
-          }
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: AppCircularProgressLoader());
-        },
+        }
+
+        List<Product> _list = [];
+        snapshot.data!.docs.forEach((element) {
+          Map<String, dynamic> data = element.data()! as Map<String, dynamic>;
+          _list.add(Product.fromJson(data));
+        });
+        divideProductListInPages(_list);
+
+        return RefreshIndicator(
+          onRefresh: () {
+            return Future.delayed(Duration(seconds: 1), () {
+              setState(() => page = (page + 1) % (productList?.length as int));
+            });
+          },
+          child: ListView.builder(
+            itemCount: productList?[page].length ?? 0,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) {
+              return _showProductList(context, productList![page][index]);
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _showProductList(BuildContext context, Product product) {
+    return Container(
+      height: 200,
+      margin: EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      padding: EdgeInsets.all(10.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              height: double.maxFinite,
+              width: double.maxFinite,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.fitHeight,
+                  image: NetworkImage("${product.imageURl}"),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Wrap(
+                    children: [
+                      Text(
+                        "Name : ",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(product.productName?.toString() ?? ""),
+                    ],
+                  ),
+                  SizedBox(height: 10.0),
+                  Wrap(
+                    children: [
+                      Text(
+                        "Description : ",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(product.productDescription?.toString() ?? ""),
+                    ],
+                  ),
+                  SizedBox(height: 10.0),
+                  Wrap(
+                    children: [
+                      Text(
+                        "Price : ",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(product.productPrice?.toString() ?? ""),
+                    ],
+                  ),
+                  SizedBox(height: 10.0),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _showProductList(BuildContext context, HomeDataLoadedState state) {
-    return ListView.builder(
-        controller: _scrollController,
-        shrinkWrap: true,
-        itemCount: productList?[page].length ?? 0,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            height: 200,
-            margin: EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              border: Border.all(),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: EdgeInsets.all(10.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        fit: BoxFit.fitHeight,
-                        image: NetworkImage(
-                            "https://media.istockphoto.com/photos/positivity-puts-you-in-a-position-of-power-picture-id1299077582?b=1&k=20&m=1299077582&s=170667a&w=0&h=Esjqlg_WCWmTc83Dv6PLhwPFwYN9uXoclBn0cUhtS5I="),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "Name : ",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(productList?[page][index]
-                                    .productName
-                                    .toString() ??
-                                ""),
-                          ],
-                        ),
-                        SizedBox(height: 10.0),
-                        Wrap(
-                          children: [
-                            Text(
-                              "Description : ",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(productList?[page][index]
-                                    .productDescription
-                                    .toString() ??
-                                ""),
-                          ],
-                        ),
-                        SizedBox(height: 10.0),
-                        Wrap(
-                          children: [
-                            Text(
-                              "Price : ",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyText1!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(productList?[page][index]
-                                    .productPrice
-                                    .toString() ??
-                                ""),
-                          ],
-                        ),
-                        SizedBox(height: 10.0),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
+  void divideProductListInPages(List<Product> list) {
+    productList = [];
+    for (int i = 0; i < list.length; i += 10) {
+      productList!
+          .add(list.sublist(i, i + 10 > list.length ? list.length : i + 10));
+    }
   }
 
   void showMoreData() {

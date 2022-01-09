@@ -1,21 +1,26 @@
 import 'package:bwys/config/screen_config.dart';
+import 'package:bwys/screens/login/bloc/login_bloc.dart';
 import 'package:bwys/utils/ui/ui_utils.dart';
 import 'package:bwys/widget/widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: <Widget>[
-            _showBackgroundImage(context),
-            _displaySignUpForm(context),
-          ],
+    return BlocProvider<LoginBloc>.value(
+      value: BlocProvider.of<LoginBloc>(context),
+      child: Scaffold(
+        body: SafeArea(
+          child: Stack(
+            children: <Widget>[
+              _showBackgroundImage(context),
+              _displaySignUpForm(context),
+            ],
+          ),
         ),
       ),
     );
@@ -108,100 +113,120 @@ class SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: "Full Name",
-              hintStyle: TextStyle(color: Colors.white),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
+    return BlocListener<LoginBloc, LoginState>(
+      listener: _loginBlocListener,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Full Name",
+                hintStyle: TextStyle(color: Colors.white),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                errorStyle: TextStyle(color: Colors.pink),
               ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
-              errorStyle: TextStyle(color: Colors.pink),
-            ),
 
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              _userName = value;
-              return null;
-            },
-          ),
-          AppSizedBoxSpacing(),
-          TextFormField(
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: "Email",
-              hintStyle: TextStyle(color: Colors.white),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
-              errorStyle: TextStyle(color: Colors.pink),
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                _userName = value;
+                return null;
+              },
             ),
+            AppSizedBoxSpacing(),
+            TextFormField(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Email",
+                hintStyle: TextStyle(color: Colors.white),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                errorStyle: TextStyle(color: Colors.pink),
+              ),
 
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              _email = value;
-              return null;
-            },
-          ),
-          AppSizedBoxSpacing(),
-          TextFormField(
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: "Password",
-              hintStyle: TextStyle(color: Colors.white),
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
-              focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                _email = value;
+                return null;
+              },
             ),
+            AppSizedBoxSpacing(),
+            TextFormField(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Password",
+                hintStyle: TextStyle(color: Colors.white),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+              ),
 
-            // The validator receives the text that the user has entered.
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              _password = value;
-              return null;
-            },
-          ),
-          AppSizedBoxSpacing(),
-          AppElevatedButton(
-            color: Colors.white,
-            minWidth: 400,
-            textColor: Colors.black,
-            message: "SIGNUP",
-            onPressed: () {
-              // Validate returns true if the form is valid, or false otherwise.
-              if (_formKey.currentState!.validate()) {
-                // If the form is valid, display a snackbar. In the real world,
-                // you'd often call a server or save the information in a database.
-                print("User Credentials:  $_userName, $_email, $_password");
-                Navigator.pop(context);
-              }
-            },
-          ),
-          AppSizedBoxSpacing(heightSpacing: AppSpacing.s),
-        ],
+              // The validator receives the text that the user has entered.
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter some text';
+                }
+                _password = value;
+                return null;
+              },
+            ),
+            AppSizedBoxSpacing(),
+            AppElevatedButton(
+              color: Colors.white,
+              minWidth: 400,
+              textColor: Colors.black,
+              message: "SIGNUP",
+              onPressed: () {
+                // Validate returns true if the form is valid, or false otherwise.
+                if (_formKey.currentState!.validate()) {
+                  // If the form is valid, display a snackbar. In the real world,
+                  // you'd often call a server or save the information in a database.
+                  BlocProvider.of<LoginBloc>(context).add(
+                    SignUpButtonPressed(cred: {
+                      "name": _userName,
+                      "email": _email,
+                      "password": _password,
+                    }),
+                  );
+                }
+              },
+            ),
+            AppSizedBoxSpacing(heightSpacing: AppSpacing.s),
+          ],
+        ),
       ),
     );
+  }
+
+  void _loginBlocListener(BuildContext context, state) {
+    if (state is SignUpResult) {
+      if (state.signUp) {
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("${state.signUpError}")),
+        );
+      }
+    }
   }
 }

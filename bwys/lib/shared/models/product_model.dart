@@ -35,19 +35,19 @@ class Product {
   });
 
   Product.fromJson(Map<String, dynamic> json) {
-    productId = json['product_id'];
-    productName = json['product_name'];
-    productDescription = json['product_description'];
-    productPrice = json['product_price'];
-    imageURl = json['imageURl'];
+    productId = json['id'];
+    productName = json['name'];
+    productDescription = json['description'];
+    productPrice = json['price'];
+    imageURl = json['imageURL'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['product_id'] = this.productId;
-    data['product_name'] = this.productName;
-    data['product_description'] = this.productDescription;
-    data['product_price'] = this.productPrice;
+    data['id'] = this.productId;
+    data['name'] = this.productName;
+    data['description'] = this.productDescription;
+    data['price'] = this.productPrice;
     data['imageURl'] = this.imageURl;
     return data;
   }

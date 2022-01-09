@@ -1,7 +1,5 @@
 import 'package:bwys/config/routes/routes_const.dart';
-import 'package:bwys/config/screen_config.dart';
 import 'package:bwys/screens/login/bloc/login_bloc.dart';
-import 'package:bwys/screens/login/repository/repository.dart';
 import 'package:bwys/utils/ui/ui_utils.dart';
 import 'package:bwys/widget/widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -48,15 +46,7 @@ class SignInScreen extends StatelessWidget {
   Widget _displaySignInForm(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(30.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          BlocProvider<LoginBloc>(
-            create: (context) => LoginBloc(repository: LoginRepositoryImpl()),
-            child: SignInForm(),
-          )
-        ],
-      ),
+      child: Center(child: SignInForm()),
     );
   }
 }
@@ -104,6 +94,7 @@ class SignInFormState extends State<SignInForm> {
     return Form(
       key: _formKey,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextFormField(
@@ -183,23 +174,7 @@ class SignInFormState extends State<SignInForm> {
               }
             },
           ),
-          Text(
-            "OR",
-            style: Theme.of(context)
-                .textTheme
-                .bodyText1!
-                .copyWith(color: Colors.white),
-          ),
-          AppSizedBoxSpacing(heightSpacing: 5),
-          AppElevatedButton(
-            color: Colors.white,
-            minWidth: 400,
-            textColor: Colors.black,
-            message: "SIGN IN WITH GOOGLE",
-            onPressed: () =>
-                BlocProvider.of<LoginBloc>(context).add(SignInWithGoogle()),
-          ),
-          AppSizedBoxSpacing(heightSpacing: AppSpacing.s),
+          AppSizedBoxSpacing(),
           Center(
             child: InkWell(
               onTap: () => Navigator.pushNamed(context, AppRoutes.signUp),

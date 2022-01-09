@@ -1,5 +1,4 @@
 import 'package:bwys/config/screen_config.dart';
-import 'package:bwys/screens/product/model/product_model.dart';
 import 'package:bwys/shared/models/product_model.dart';
 import 'package:bwys/utils/ui/ui_utils.dart';
 import 'package:flutter/material.dart';

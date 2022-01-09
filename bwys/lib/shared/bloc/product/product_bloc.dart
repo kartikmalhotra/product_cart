@@ -1,14 +1,8 @@
-import 'dart:io';
-
 import 'package:bwys/config/application.dart';
-import 'package:bwys/data/data.dart';
-import 'package:bwys/screens/add_product/add_product.dart';
 import 'package:bwys/screens/home/repository/repository.dart';
 import 'package:bwys/shared/models/product_model.dart';
 import 'package:bwys/shared/models/rest_api_error_model.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -22,24 +16,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   @override
   Stream<ProductState> mapEventToState(ProductEvent event) async* {
-    if (event is GetHomeScreenData) {
-      yield* _mapGetHomeScreenDataToState();
-    } else if (event is AddProductData) {
+    if (event is AddProductData) {
       yield* _mapAddProductDataToState(event);
-    }
-  }
-
-  Stream<ProductState> _mapGetHomeScreenDataToState() async* {
-    yield ShowHomeLoader();
-
-    await Future.delayed(const Duration(seconds: 2), () {});
-    var response = productItems;
-
-    if (response is! RestAPIErrorModel &&
-        response is! RestAPIUnAuthenticationModel) {
-      ProductList data = ProductList.fromJson({'data': response});
-      divideDataIntoPages(data.products);
-      yield HomeDataLoadedState(products: productRepository.productList);
     }
   }
 
@@ -49,7 +27,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         _productDetails["name"],
         _productDetails["description"],
         _productDetails["price"],
-        _productDetails["image"]);
+        _productDetails["image"] ?? "");
     if (response == "success") {
       yield AddProductMessage(productAdded: true);
     } else {

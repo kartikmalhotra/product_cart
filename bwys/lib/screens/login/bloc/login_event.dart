@@ -16,6 +16,11 @@ class SignInButtonPressed extends LoginEvent {
   List<Object> get props => [cred];
 }
 
-class SignInWithGoogle extends LoginEvent {
-  const SignInWithGoogle();
+class SignUpButtonPressed extends LoginEvent {
+  final Map<String, dynamic> cred;
+
+  const SignUpButtonPressed({required this.cred});
+
+  @override
+  List<Object> get props => [cred];
 }

@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:bwys/bwys_app.dart';
 import 'package:bwys/config/application.dart';
 import 'package:bwys/config/routes/routes_const.dart';
 import 'package:bwys/config/screen_config.dart';
-import 'package:bwys/screens/login/screens/signin.dart';
 import 'package:bwys/utils/ui/ui_utils.dart';
 import 'package:bwys/widget/widget.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if (Application.firebaseService!.checkUser()) {
         Navigator.popAndPushNamed(context, AppRoutes.appScreen);
       } else {
-        Navigator.popAndPushNamed(context, AppRoutes.root);
+        Navigator.popAndPushNamed(context, AppRoutes.signIn);
       }
     });
   }

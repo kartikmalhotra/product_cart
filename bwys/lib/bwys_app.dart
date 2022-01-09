@@ -42,6 +42,13 @@ class _AppScreenState extends State<AppScreen> {
     return Scaffold(
       backgroundColor: LightAppColors.cardBackground,
       extendBodyBehindAppBar: true,
+      drawer: Drawer(),
+      appBar: _currentIndex == 0
+          ? AppBar(
+              title: Text("Products",
+                  style: Theme.of(context).textTheme.headline6),
+            )
+          : null,
       body: SafeArea(
         child: BlocProvider<ProductBloc>.value(
           value: BlocProvider.of<ProductBloc>(context),

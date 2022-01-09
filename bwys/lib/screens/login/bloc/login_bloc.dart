@@ -16,8 +16,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Stream<LoginState> mapEventToState(LoginEvent event) async* {
     if (event is SignInButtonPressed) {
       yield* _mapSignInButtonPressedToState(event);
-    } else if (event is SignInWithGoogle) {
-      yield* _mapSignInWithGoogleToState(event);
+    } else if (event is SignUpButtonPressed) {
+      yield* _mapSignUpButtonPressedToState(event);
     }
   }
 
@@ -44,16 +44,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     }
   }
 
-  Stream<LoginState> _mapSignInWithGoogleToState(
-      SignInWithGoogle event) async* {
-    var response = await Application.firebaseService!.signInWithGoogle();
-    if (response is! Exception) {
-      // Navigator.of(context).pushNamedAndRemoveUntil(
-      //     AppRoutes.appScreen, (Route<dynamic> route) => false);
+  Stream<LoginState> _mapSignUpButtonPressedToState(
+      SignUpButtonPressed event) async* {
+    Map<String, dynamic> cred = event.cred;
+
+    var response = await Application.firebaseService!
+        .createNewUser(cred["email"], cred["password"]);
+
+    if (response is UserCredential) {
+      yield SignUpResult(signUp: true, signUpError: "");
     }
-
-    // Map<String, dynamic>? checkUser = checkUserValid(event.cred);
+    yield SignUpResult(signUp: false, signUpError: response);
   }
-
- 
 }

@@ -24,3 +24,19 @@ class SignInResult extends LoginState {
         signInError,
       ];
 }
+
+class SignUpResult extends LoginState {
+  final bool signUp;
+  final String signUpError;
+
+  const SignUpResult({
+    required this.signUp,
+    required this.signUpError,
+  });
+
+  @override
+  List<Object> get props => [
+        signUp,
+        signUpError,
+      ];
+}

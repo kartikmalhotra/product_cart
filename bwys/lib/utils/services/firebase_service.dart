@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseServices {
@@ -15,6 +14,8 @@ class FirebaseServices {
   static FirebaseStorage? _firebaseStorage;
 
   FirebaseServices._internal();
+
+  FirebaseFirestore? get firestoreInstance => _firestore;
 
   static Future<FirebaseServices> getInstance() async {
     /// Intialize Firebase App Instance
@@ -52,9 +53,7 @@ class FirebaseServices {
     _firebaseAuth!.authStateChanges().listen((User? user) {
       if (user == null) {
         print('User is currently signed out!');
-      } else {
-        ;
-      }
+      } else {}
     });
   }
 
@@ -81,16 +80,18 @@ class FirebaseServices {
   }
 
   /// Create New User using firebase
-  Future createNewUser(String email, String password) async {
+  Future<dynamic> createNewUser(String email, String password) async {
     try {
       UserCredential userCredential = await _firebaseAuth!
           .createUserWithEmailAndPassword(email: email, password: password);
+      return userCredential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
+        return 'The password provided is too weak.';
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+        return 'The account already exists for that email.';
       }
+      return e.code;
     } catch (e) {
       print(e);
     }
@@ -162,19 +163,20 @@ class FirebaseServices {
         .substring(image.path.lastIndexOf("/"), image.path.lastIndexOf("."))
         .replaceAll("/", "");
 
-    TaskSnapshot? task =
-        await _firebaseStorage?.ref('product/$imageName').putFile(image);
+    TaskSnapshot? task;
 
     try {
-      await task;
+      task = await _firebaseStorage?.ref('product/$imageName').putFile(image);
     } on FirebaseException catch (e) {
       if (e.code == 'permission-denied') {
         message = 'User does not have permission to upload to this reference.';
       }
     }
-    _firestore!.collection("proiduct_data").add({
+
+    await _firestore!.collection("proiduct_data").add({
       "name": name,
       "description": description,
+      "price": price,
       "imageURL": await task?.ref.getDownloadURL() ?? "",
       "created_at": new DateTime.now(),
       "updated_at": new DateTime.now()
